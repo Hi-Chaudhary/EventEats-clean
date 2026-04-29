@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="mb-4">
+    <a href="{% url 'event_detail' event.id %}" class="btn btn-outline-secondary btn-sm">
+        Back to Event
+    </a>
+</div>
+
+<h1>Register & Book Food</h1>
+<p class="text-muted">
+    Event: <strong>{{ event.title }}</strong>
+</p>
+
+<form method="POST">
+    {% csrf_token %}
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-success text-white">
+            Select Food Items
+        </div>
+
+        <div class="card-body">
+            {% if food_items %}
+                <table class="table table-bordered align-middle">
+                    <thead>
+                        <tr>
+                            <th>Food Item</th>
+                            <th>Description</th>
+                            <th>Price</th>
+                            <th>Available Qty</th>
+                            <th>Your Qty</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for item in food_items %}
+                            <tr>
+                                <td><strong>{{ item.name }}</strong></td>
+                                <td>{{ item.description }}</td>
+                                <td>${{ item.price }}</td>
+                                <td>{{ item.quantity_available }}</td>
+                                <td>
+                                    <input
+                                        type="number"
+                                        name="quantity_{{ item.id }}"
+                                        class="form-control"
+                                        min="0"
+                                        max="{{ item.quantity_available }}"
+                                        value="0"
+                                    >
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <button type="submit" class="btn btn-success w-100">
+                    Confirm Registration & Food Booking
+                </button>
+            {% else %}
+                <p>No food items available.</p>
+
+                <button type="submit" class="btn btn-success">
+                    Register Without Food
+                </button>
+            {% endif %}
+        </div>
+    </div>
+</form>
+
+{% endblock %}
