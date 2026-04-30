@@ -1,60 +1,94 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
 
-<div class="card shadow-sm mb-4">
-    <div class="card-header bg-dark text-white">
-        Event Details
-    </div>
+<section class="py-5 bg-light">
+    <div class="container">
 
-    <div class="card-body">
-        <h1>{{ event.title }}</h1>
-        <p class="lead">{{ event.description }}</p>
+        <div class="card shadow border-0 mb-5">
 
-        <p><strong>Venue:</strong> {{ event.venue }}</p>
-        <p><strong>Date:</strong> {{ event.event_date }}</p>
-        <p><strong>Time:</strong> {{ event.event_time }}</p>
-        <p><strong>Organizer:</strong> {{ event.organizer.organization_name }}</p>
-
-        {% if user.is_authenticated and user.role == 'user' %}
-            {% if already_registered %}
-                <div class="alert alert-success">
-                    You are already registered for this event.
-                </div>
-
-                <a href="{% url 'my_bookings' %}" class="btn btn-primary">
-                    View My Bookings
-                </a>
+            {% if event.image %}
+                <img src="{{ event.image.url }}" class="card-img-top" alt="{{ event.title }}" style="height: 420px; object-fit: cover;">
             {% else %}
-                <a href="{% url 'register_and_book_food' event.id %}" class="btn btn-success">
-                    Register & Book Food
-                </a>
+                <img src="{% static 'images/default-event.jpg' %}" class="card-img-top" alt="Default event image" style="height: 420px; object-fit: cover;">
             {% endif %}
-        {% elif not user.is_authenticated %}
-            <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#authModal">
-                Login to Register
-            </button>
-        {% endif %}
-    </div>
-</div>
 
-<h3 class="mb-3">Available Food Items</h3>
+            <div class="card-body p-4">
+                <span class="badge bg-success mb-3">Published Event</span>
 
-<div class="row">
-    {% for item in food_items %}
-        <div class="col-md-4 mb-3">
-            <div class="card h-100 shadow-sm">
-                <div class="card-body">
-                    <h5>{{ item.name }}</h5>
-                    <p>{{ item.description }}</p>
-                    <p><strong>Price:</strong> ${{ item.price }}</p>
-                    <p><strong>Available:</strong> {{ item.quantity_available }}</p>
+                <h1 class="fw-bold">{{ event.title }}</h1>
+                <p class="lead text-muted">{{ event.description }}</p>
+
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <p><strong>Venue:</strong> {{ event.venue }}</p>
+                        <p><strong>Date:</strong> {{ event.event_date }}</p>
+                        <p><strong>Time:</strong> {{ event.event_time }}</p>
+                    </div>
+
+                    <div class="col-md-6">
+                        <p><strong>Organizer:</strong> {{ event.organizer.organization_name }}</p>
+                    </div>
                 </div>
+
+                <hr>
+
+                {% if user.is_authenticated and user.role == 'user' %}
+                    {% if already_registered %}
+                        <div class="alert alert-success">
+                            You are already registered for this event.
+                        </div>
+
+                        <a href="{% url 'my_bookings' %}" class="btn btn-primary">
+                            View My Bookings
+                        </a>
+                    {% else %}
+                        <a href="{% url 'register_and_book_food' event.id %}" class="btn btn-success">
+                            Register & Book Food
+                        </a>
+                    {% endif %}
+                {% elif not user.is_authenticated %}
+                    <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#authModal">
+                        Login to Register
+                    </button>
+                {% endif %}
             </div>
         </div>
-    {% empty %}
-        <p>No food items available for this event yet.</p>
-    {% endfor %}
-</div>
+
+        <div class="mb-4 text-center">
+            <h3 class="fw-bold">Available Food Items</h3>
+            <p class="text-muted">Pre-book food before attending the event.</p>
+        </div>
+
+        <div class="row">
+            {% for item in food_items %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 shadow-sm border-0">
+
+                        {% if item.image %}
+                            <img src="{{ item.image.url }}" class="card-img-top" alt="{{ item.name }}" style="height: 220px; object-fit: cover;">
+                        {% else %}
+                            <img src="{% static 'images/default-food.jpg' %}" class="card-img-top" alt="Default food image" style="height: 220px; object-fit: cover;">
+                        {% endif %}
+
+                        <div class="card-body">
+                            <h5 class="fw-bold">{{ item.name }}</h5>
+                            <p class="text-muted">{{ item.description }}</p>
+                            <p class="mb-1"><strong>Price:</strong> ${{ item.price }}</p>
+                            <p><strong>Available:</strong> {{ item.quantity_available }}</p>
+                        </div>
+
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12 text-center">
+                    <p class="text-muted">No food items available for this event yet.</p>
+                </div>
+            {% endfor %}
+        </div>
+
+    </div>
+</section>
 
 {% endblock %}

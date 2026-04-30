@@ -1,62 +1,82 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
 
-<div class="text-center mb-5">
-    <h1 class="display-4 fw-bold">Welcome to EventEats</h1>
-    <p class="lead">Register for events and prebook your food before you arrive.</p>
+<section class="text-white text-center d-flex align-items-center justify-content-center"
+         style="background-image: url("{% static 'images/hero-banner.png' %}"");
+                background-size: cover;
+                background-position: center;
+                min-height: 420px;">
+    <div class="bg-dark bg-opacity-50 p-5 rounded">
+        <h1 class="display-4 fw-bold">Welcome to EventEats</h1>
+        <p class="lead">Register for events and prebook your food before you arrive.</p>
 
-    {% if user.is_authenticated %}
-        <div class="alert alert-success mt-4">
-            You are logged in as <strong>{{ user.role }}</strong>.
-        </div>
-
-        {% if user.role == 'organizer' %}
-            <a href="{% url 'organizer_dashboard' %}" class="btn btn-success btn-lg mt-3">
-                Go to Organizer Dashboard
-            </a>
-        {% elif user.role == 'user' %}
-            <a href="{% url 'event_list' %}" class="btn btn-primary btn-lg mt-3">
-                Explore Events
-            </a>
-        {% elif user.role == 'admin' %}
-            <a href="/admin/" class="btn btn-dark btn-lg mt-3">
-                Go to Admin Panel
-            </a>
-        {% endif %}
-    {% else %}
-        <button class="btn btn-warning btn-lg mt-3" data-bs-toggle="modal" data-bs-target="#authModal">
-            Get Started
-        </button>
-    {% endif %}
-</div>
-
-<hr>
-
-<h2 class="mb-4">Published Events</h2>
-
-<div class="row">
-    {% if event in published_events %}
-    {% for event in published_events %}
-        <div class="col-md-4 mb-4">
-            <div class="card h-100 shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">{{ event.title }}</h5>
-                    <p class="card-text">{{ event.description|truncatewords:20 }}</p>
-                    <p><strong>Venue:</strong> {{ event.venue }}</p>
-                    <p><strong>Date:</strong> {{ event.event_date }}</p>
-                    <p><strong>Time:</strong> {{ event.event_time }}</p>
-
-                    <a href="{% url 'event_detail' event.id %}" class="btn btn-primary w-100">
-                        View Details
-                    </a>
-                </div>
+        {% if user.is_authenticated %}
+            <div class="alert alert-success mt-4">
+                You are logged in as <strong>{{ user.role }}</strong>.
             </div>
+
+            {% if user.role == 'organizer' %}
+                <a href="{% url 'organizer_dashboard' %}" class="btn btn-success btn-lg mt-3">
+                    Go to Organizer Dashboard
+                </a>
+            {% elif user.role == 'user' %}
+                <a href="{% url 'event_list' %}" class="btn btn-primary btn-lg mt-3">
+                    Explore Events
+                </a>
+            {% elif user.role == 'admin' %}
+                <a href="/admin/" class="btn btn-dark btn-lg mt-3">
+                    Go to Admin Panel
+                </a>
+            {% endif %}
+        {% else %}
+            <button class="btn btn-warning btn-lg mt-3" data-bs-toggle="modal" data-bs-target="#authModal">
+                Get Started
+            </button>
+        {% endif %}
+    </div>
+</section>
+
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">Published Events</h2>
+            <p class="text-muted">Discover upcoming events and pre-book your food.</p>
         </div>
-    {% empty %}
-        <p>No published events yet.</p>
-    {% endfor %}
-    {%endif%}
-</div>
+
+        <div class="row">
+            {% for event in published_events %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 shadow-sm border-0">
+
+                        {% if event.image %}
+                            <img src="{{ event.image.url }}" class="card-img-top" alt="{{ event.title }}" style="height: 220px; object-fit: cover;">
+                        {% else %}
+                            <img src="{% static 'images/default-event.jpg' %}" class="card-img-top" alt="Default event image" style="height: 220px; object-fit: cover;">
+                        {% endif %}
+
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title fw-bold">{{ event.title }}</h5>
+                            <p class="card-text text-muted">{{ event.description|truncatewords:20 }}</p>
+                            <p class="mb-1"><strong>Venue:</strong> {{ event.venue }}</p>
+                            <p class="mb-1"><strong>Date:</strong> {{ event.event_date }}</p>
+                            <p class="mb-3"><strong>Time:</strong> {{ event.event_time }}</p>
+
+                            <a href="{% url 'event_detail' event.id %}" class="btn btn-primary w-100 mt-auto">
+                                View Details
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12 text-center">
+                    <p class="text-muted">No published events yet.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
 
 {% endblock %}

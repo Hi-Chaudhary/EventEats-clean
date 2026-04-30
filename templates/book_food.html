@@ -1,47 +1,73 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
 
-<div class="mb-4">
-    <a href="{% url 'event_detail' event.id %}" class="btn btn-outline-secondary btn-sm">
-        Back to Event
-    </a>
-</div>
+<section class="py-5 bg-light">
 
-<h1>Register & Book Food</h1>
-<p class="text-muted">
-    Event: <strong>{{ event.title }}</strong>
-</p>
+    <div class="container">
 
-<form method="POST">
-    {% csrf_token %}
-
-    <div class="card shadow-sm">
-        <div class="card-header bg-success text-white">
-            Select Food Items
+        <div class="mb-4">
+            <a href="{% url 'event_detail' event.id %}" class="btn btn-outline-secondary btn-sm">
+                ← Back to Event
+            </a>
         </div>
 
-        <div class="card-body">
-            {% if food_items %}
-                <table class="table table-bordered align-middle">
-                    <thead>
-                        <tr>
-                            <th>Food Item</th>
-                            <th>Description</th>
-                            <th>Price</th>
-                            <th>Available Qty</th>
-                            <th>Your Qty</th>
-                        </tr>
-                    </thead>
+        <div class="text-center mb-5">
+            <h1 class="fw-bold">Register & Book Food</h1>
+            <p class="text-muted">
+                Event: <strong>{{ event.title }}</strong>
+            </p>
+        </div>
 
-                    <tbody>
-                        {% for item in food_items %}
-                            <tr>
-                                <td><strong>{{ item.name }}</strong></td>
-                                <td>{{ item.description }}</td>
-                                <td>${{ item.price }}</td>
-                                <td>{{ item.quantity_available }}</td>
-                                <td>
+        <form method="POST">
+            {% csrf_token %}
+
+            {% if food_items %}
+
+                <div class="row">
+
+                    {% for item in food_items %}
+                        <div class="col-md-4 mb-4">
+
+                            <div class="card h-100 shadow-sm border-0">
+
+                                {% if item.image %}
+                                    <img src="{{ item.image.url }}"
+                                         class="card-img-top"
+                                         alt="{{ item.name }}"
+                                         style="height:220px; object-fit:cover;">
+                                {% else %}
+                                    <img src="{% static 'images/default-food.jpg' %}"
+                                         class="card-img-top"
+                                         alt="Default food image"
+                                         style="height:220px; object-fit:cover;">
+                                {% endif %}
+
+                                <div class="card-body">
+
+                                    <h5 class="fw-bold">
+                                        {{ item.name }}
+                                    </h5>
+
+                                    <p class="text-muted">
+                                        {{ item.description }}
+                                    </p>
+
+                                    <p class="mb-1">
+                                        <strong>Price:</strong>
+                                        ${{ item.price }}
+                                    </p>
+
+                                    <p class="mb-3">
+                                        <strong>Available:</strong>
+                                        {{ item.quantity_available }}
+                                    </p>
+
+                                    <label class="form-label fw-semibold">
+                                        Select Quantity
+                                    </label>
+
                                     <input
                                         type="number"
                                         name="quantity_{{ item.id }}"
@@ -50,24 +76,40 @@
                                         max="{{ item.quantity_available }}"
                                         value="0"
                                     >
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
 
-                <button type="submit" class="btn btn-success w-100">
-                    Confirm Registration & Food Booking
-                </button>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    {% endfor %}
+
+                </div>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-success w-100 py-3">
+                        Confirm Registration & Food Booking
+                    </button>
+                </div>
+
             {% else %}
-                <p>No food items available.</p>
 
-                <button type="submit" class="btn btn-success">
-                    Register Without Food
-                </button>
+                <div class="card shadow-sm p-4 text-center">
+
+                    <h4>No food items available</h4>
+
+                    <button type="submit" class="btn btn-success mt-3">
+                        Register Without Food
+                    </button>
+
+                </div>
+
             {% endif %}
-        </div>
+
+        </form>
+
     </div>
-</form>
+
+</section>
 
 {% endblock %}

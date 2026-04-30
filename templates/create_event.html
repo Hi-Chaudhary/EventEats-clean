@@ -2,51 +2,74 @@
 
 {% block content %}
 
-<div class="row justify-content-center">
-    <div class="col-md-8">
+<section class="py-5 bg-light">
 
-        <div class="card shadow-sm">
-            <div class="card-header bg-success text-white">
-                Create Event
+    <div class="container">
+
+        <div class="row justify-content-center">
+
+            <div class="col-md-8">
+
+                <div class="card shadow border-0">
+
+                    <div class="card-header bg-success text-white text-center py-3">
+                        <h4 class="mb-0">Create New Event</h4>
+                    </div>
+
+                    <div class="card-body p-4">
+
+                        <form method="POST" enctype="multipart/form-data">
+                            {% csrf_token %}
+
+                            <div class="mb-3">
+                                {{ form.title.label_tag }}
+                                {{ form.title }}
+                            </div>
+
+                            <div class="mb-3">
+                                {{ form.description.label_tag }}
+                                {{ form.description }}
+                            </div>
+
+                            <div class="mb-3">
+                                {{ form.venue.label_tag }}
+                                {{ form.venue }}
+                            </div>
+
+                            <div class="mb-3">
+                                {{ form.event_date.label_tag }}
+                                {{ form.event_date }}
+                            </div>
+
+                            <div class="mb-3">
+                                {{ form.event_time.label_tag }}
+                                {{ form.event_time }}
+                            </div>
+
+                            <div class="mb-4">
+                                {{ form.image.label_tag }}
+                                {{ form.image }}
+                                <small class="text-muted">
+                                    Upload event poster or banner
+                                </small>
+                            </div>
+
+                            <button type="submit" class="btn btn-success w-100 py-3">
+                                Submit Event for Approval
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
             </div>
 
-            <div class="card-body">
-                <form method="POST">
-                    {% csrf_token %}
-
-                    <div class="mb-3">
-                        {{ form.title.label_tag }}
-                        {{ form.title }}
-                    </div>
-
-                    <div class="mb-3">
-                        {{ form.description.label_tag }}
-                        {{ form.description }}
-                    </div>
-
-                    <div class="mb-3">
-                        {{ form.venue.label_tag }}
-                        {{ form.venue }}
-                    </div>
-
-                    <div class="mb-3">
-                        {{ form.event_date.label_tag }}
-                        {{ form.event_date }}
-                    </div>
-
-                    <div class="mb-3">
-                        {{ form.event_time.label_tag }}
-                        {{ form.event_time }}
-                    </div>
-
-                    <button type="submit" class="btn btn-success w-100">
-                        Submit Event for Approval
-                    </button>
-                </form>
-            </div>
         </div>
 
     </div>
-</div>
+
+</section>
 
 {% endblock %}

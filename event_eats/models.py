@@ -42,6 +42,7 @@ class Event(models.Model):
     event_time = models.TimeField()
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=PENDING)
     created_at = models.DateTimeField(auto_now_add=True)
+    image = models.ImageField(upload_to='events/', blank=True, null=True)
 
     def __str__(self):
         return self.title
@@ -55,6 +56,7 @@ class FoodItem(models.Model):
     quantity_available = models.PositiveIntegerField()
     is_available = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    image = models.ImageField(upload_to='food_items/', blank=True, null=True)
 
     def __str__(self):
         return f"{self.name} - {self.event.title}"

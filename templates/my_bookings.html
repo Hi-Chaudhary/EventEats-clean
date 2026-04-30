@@ -1,52 +1,75 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
 
-<h1 class="mb-4">My Bookings</h1>
+<section class="py-5 bg-light">
+    <div class="container">
 
-{% if registrations %}
-    {% for registration in registrations %}
-        <div class="card shadow-sm mb-4">
-            <div class="card-header bg-dark text-white">
-                {{ registration.event.title }}
-            </div>
-
-            <div class="card-body">
-                <p><strong>Venue:</strong> {{ registration.event.venue }}</p>
-                <p><strong>Date:</strong> {{ registration.event.event_date }}</p>
-                <p><strong>Time:</strong> {{ registration.event.event_time }}</p>
-                <p><strong>Registered At:</strong> {{ registration.registered_at }}</p>
-
-                <h5 class="mt-4">Food Bookings</h5>
-
-                {% if registration.food_bookings.all %}
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Food Item</th>
-                                <th>Quantity</th>
-                                <th>Total Price</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            {% for booking in registration.food_bookings.all %}
-                                <tr>
-                                    <td>{{ booking.food_item.name }}</td>
-                                    <td>{{ booking.quantity }}</td>
-                                    <td>${{ booking.total_price }}</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                {% else %}
-                    <p>No food booked for this event.</p>
-                {% endif %}
-            </div>
+        <div class="text-center mb-5">
+            <h1 class="fw-bold">My Bookings</h1>
+            <p class="text-muted">View your event registrations and food bookings.</p>
         </div>
-    {% endfor %}
-{% else %}
-    <p>You have not registered for any events yet.</p>
-{% endif %}
+
+        {% if registrations %}
+            {% for registration in registrations %}
+                <div class="card shadow-sm border-0 mb-4">
+
+                    {% if registration.event.image %}
+                        <img src="{{ registration.event.image.url }}" class="card-img-top" alt="{{ registration.event.title }}" style="height: 280px; object-fit: cover;">
+                    {% else %}
+                        <img src="{% static 'images/default-event.jpg' %}" class="card-img-top" alt="Default event image" style="height: 280px; object-fit: cover;">
+                    {% endif %}
+
+                    <div class="card-body p-4">
+                        <h3 class="fw-bold">{{ registration.event.title }}</h3>
+
+                        <p class="mb-1"><strong>Venue:</strong> {{ registration.event.venue }}</p>
+                        <p class="mb-1"><strong>Date:</strong> {{ registration.event.event_date }}</p>
+                        <p class="mb-1"><strong>Time:</strong> {{ registration.event.event_time }}</p>
+                        <p><strong>Registered At:</strong> {{ registration.registered_at }}</p>
+
+                        <h5 class="mt-4 mb-3">Food Bookings</h5>
+
+                        {% if registration.food_bookings.all %}
+                            <div class="table-responsive">
+                                <table class="table table-bordered align-middle">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>Food Item</th>
+                                            <th>Quantity</th>
+                                            <th>Total Price</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        {% for booking in registration.food_bookings.all %}
+                                            <tr>
+                                                <td>{{ booking.food_item.name }}</td>
+                                                <td>{{ booking.quantity }}</td>
+                                                <td>${{ booking.total_price }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <p class="text-muted">No food booked for this event.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="card shadow-sm border-0 p-5 text-center">
+                <h4>No bookings yet</h4>
+                <p class="text-muted">You have not registered for any events yet.</p>
+                <a href="{% url 'event_list' %}" class="btn btn-primary">
+                    Explore Events
+                </a>
+            </div>
+        {% endif %}
+
+    </div>
+</section>
 
 {% endblock %}
