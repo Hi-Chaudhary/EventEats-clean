@@ -14,4 +14,13 @@ urlpatterns = [
     path('events/<int:event_id>/book-food/', views.register_and_book_food, name='register_and_book_food'),
 
     path('my-bookings/', views.my_bookings, name='my_bookings'),
+
+    path('stripe/success/', views.stripe_success, name='stripe_success'),
+    path('stripe/cancel/', views.stripe_cancel, name='stripe_cancel'),
+    path('stripe/webhook/', views.stripe_webhook, name='stripe_webhook'),
+    path(
+        'stripe/resume/<int:registration_id>/',
+        views.resume_stripe_checkout,
+        name='resume_stripe_checkout',
+    ),
 ]

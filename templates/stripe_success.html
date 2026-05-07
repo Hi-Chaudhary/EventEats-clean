@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<section class="py-5 bg-light">
+    <div class="container col-lg-6 mx-auto">
+        <div class="card shadow border-0">
+            <div class="card-body p-5 text-center">
+                <h1 class="h4 fw-bold mb-3">Thanks — Stripe checkout completed</h1>
+                <p class="text-muted">
+                    Your payment is being confirmed by Stripe. If it succeeds, your booking will show as
+                    <strong>Paid</strong> on <strong>My Bookings</strong> within a few moments.
+                </p>
+                <p class="small text-muted mb-4">
+                    Event: {{ registration.event.title }}
+                </p>
+                <a href="{% url 'my_bookings' %}" class="btn btn-success btn-lg">Go to My Bookings</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

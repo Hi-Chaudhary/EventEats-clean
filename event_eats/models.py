@@ -63,23 +63,67 @@ class FoodItem(models.Model):
 
 
 class EventRegistration(models.Model):
+    NONE = 'none'
+    PENDING = 'pending'
+    PAID = 'paid'
+    CANCELLED = 'cancelled'
+    EXPIRED = 'expired'
+
+    PAYMENT_STATUS_CHOICES = [
+        (NONE, 'None'),
+        (PENDING, 'Pending'),
+        (PAID, 'Paid'),
+        (CANCELLED, 'Cancelled'),
+        (EXPIRED, 'Expired'),
+    ]
+
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='registrations')
     event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='registrations')
     registered_at = models.DateTimeField(auto_now_add=True)
+    payment_status = models.CharField(
+        max_length=20,
+        choices=PAYMENT_STATUS_CHOICES,
+        default=NONE,
+    )
+    stripe_session_id = models.CharField(max_length=255, blank=True, null=True)
+    stripe_payment_intent_id = models.CharField(max_length=255, blank=True, null=True)
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
     class Meta:
         unique_together = ('user', 'event')
+
+    def has_pending_food_payment(self) -> bool:
+        """True if any food lines are still awaiting Stripe confirmation."""
+        return self.food_bookings.filter(payment_status='pending').exists()
 
     def __str__(self):
         return f"{self.user.email} registered for {self.event.title}"
 
 
 class FoodBooking(models.Model):
+    PENDING = 'pending'
+    PAID = 'paid'
+    CANCELLED = 'cancelled'
+    EXPIRED = 'expired'
+
+    PAYMENT_STATUS_CHOICES = [
+        (PENDING, 'Pending'),
+        (PAID, 'Paid'),
+        (CANCELLED, 'Cancelled'),
+        (EXPIRED, 'Expired'),
+    ]
+
     registration = models.ForeignKey(EventRegistration, on_delete=models.CASCADE, related_name='food_bookings')
     food_item = models.ForeignKey(FoodItem, on_delete=models.CASCADE, related_name='bookings')
     quantity = models.PositiveIntegerField()
     total_price = models.DecimalField(max_digits=8, decimal_places=2)
     booked_at = models.DateTimeField(auto_now_add=True)
+    payment_status = models.CharField(
+        max_length=20,
+        choices=PAYMENT_STATUS_CHOICES,
+        default=PENDING,
+    )
+    stripe_checkout_session_id = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
         return f"{self.food_item.name} x {self.quantity}"

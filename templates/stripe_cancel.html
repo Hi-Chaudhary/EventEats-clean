@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<section class="py-5 bg-light">
+    <div class="container col-lg-6 mx-auto">
+        <div class="card shadow border-0">
+            <div class="card-body p-5 text-center">
+                <h1 class="h4 fw-bold mb-3">Checkout cancelled</h1>
+                <p class="text-muted">
+                    No payment was taken. Any reserved items for this checkout have been released back to stock.
+                </p>
+                <p class="small text-muted mb-4">
+                    Event: {{ event.title }}
+                </p>
+                <a href="{% url 'event_detail' event.id %}" class="btn btn-outline-primary me-2">Back to event</a>
+                <a href="{% url 'my_bookings' %}" class="btn btn-primary">My Bookings</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

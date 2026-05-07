@@ -1,6 +1,12 @@
 from django import forms
 from django.contrib.auth import authenticate
+from django.db import IntegrityError
+
 from .models import CustomUser, Event, FoodItem
+
+_DUPLICATE_EMAIL_MSG = (
+    "An account with this email already exists. Try logging in instead."
+)
 
 
 class UserRegisterForm(forms.ModelForm):
@@ -30,16 +36,28 @@ class UserRegisterForm(forms.ModelForm):
             }),
         }
 
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if email:
+            email = email.strip().lower()
+            if CustomUser.objects.filter(username__iexact=email).exists():
+                raise forms.ValidationError(_DUPLICATE_EMAIL_MSG)
+        return email
+
     def save(self, commit=True):
+        email = self.cleaned_data['email']
         user = CustomUser()
-        user.username = self.cleaned_data['email']
-        user.email = self.cleaned_data['email']
+        user.username = email
+        user.email = email
         user.first_name = self.cleaned_data['name']
         user.role = CustomUser.USER
         user.set_password(self.cleaned_data['password'])
 
         if commit:
-            user.save()
+            try:
+                user.save()
+            except IntegrityError:
+                raise forms.ValidationError({'email': [_DUPLICATE_EMAIL_MSG]}) from None
 
         return user
 
@@ -69,10 +87,19 @@ class OrganizerRegisterForm(forms.ModelForm):
             'phone': forms.TextInput(attrs={'class': 'form-control'}),
         }
 
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if email:
+            email = email.strip().lower()
+            if CustomUser.objects.filter(username__iexact=email).exists():
+                raise forms.ValidationError(_DUPLICATE_EMAIL_MSG)
+        return email
+
     def save(self, commit=True):
+        email = self.cleaned_data['email']
         user = CustomUser()
-        user.username = self.cleaned_data['email']
-        user.email = self.cleaned_data['email']
+        user.username = email
+        user.email = email
         user.organization_name = self.cleaned_data['organization_name']
         user.contact_person = self.cleaned_data['contact_person']
         user.phone = self.cleaned_data['phone']
@@ -80,7 +107,10 @@ class OrganizerRegisterForm(forms.ModelForm):
         user.set_password(self.cleaned_data['password'])
 
         if commit:
-            user.save()
+            try:
+                user.save()
+            except IntegrityError:
+                raise forms.ValidationError({'email': [_DUPLICATE_EMAIL_MSG]}) from None
 
         return user
 

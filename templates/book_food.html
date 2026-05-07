@@ -18,9 +18,15 @@
             <p class="text-muted">
                 Event: <strong>{{ event.title }}</strong>
             </p>
+            <p class="text-muted small">
+                Pay in <strong>AUD</strong> with Stripe. Select only food you want, or leave all at 0 to register for the event only.
+            </p>
+            <p class="fw-semibold" id="aud-total-preview" aria-live="polite">
+                Estimated total: <span id="aud-total-amount">0.00</span> AUD
+            </p>
         </div>
 
-        <form method="POST">
+        <form method="POST" id="book-food-form">
             {% csrf_token %}
 
             {% if food_items %}
@@ -56,7 +62,7 @@
 
                                     <p class="mb-1">
                                         <strong>Price:</strong>
-                                        ${{ item.price }}
+                                        {{ item.price }} AUD
                                     </p>
 
                                     <p class="mb-3">
@@ -71,7 +77,8 @@
                                     <input
                                         type="number"
                                         name="quantity_{{ item.id }}"
-                                        class="form-control"
+                                        class="form-control food-qty-input"
+                                        data-unit-price="{{ item.price }}"
                                         min="0"
                                         max="{{ item.quantity_available }}"
                                         value="0"
@@ -88,7 +95,7 @@
 
                 <div class="mt-4">
                     <button type="submit" class="btn btn-success w-100 py-3">
-                        Confirm Registration & Food Booking
+                        Proceed to payment (AUD)
                     </button>
                 </div>
 
@@ -99,7 +106,7 @@
                     <h4>No food items available</h4>
 
                     <button type="submit" class="btn btn-success mt-3">
-                        Register Without Food
+                        Register for event only (no payment)
                     </button>
 
                 </div>
@@ -111,5 +118,24 @@
     </div>
 
 </section>
+
+<script>
+(function () {
+    const inputs = document.querySelectorAll('.food-qty-input');
+    const out = document.getElementById('aud-total-amount');
+    if (!inputs.length || !out) return;
+    function recalc() {
+        let t = 0;
+        inputs.forEach(function (el) {
+            const q = parseInt(el.value, 10) || 0;
+            const p = parseFloat(el.dataset.unitPrice) || 0;
+            t += q * p;
+        });
+        out.textContent = t.toFixed(2);
+    }
+    inputs.forEach(function (el) { el.addEventListener('input', recalc); });
+    recalc();
+})();
+</script>
 
 {% endblock %}

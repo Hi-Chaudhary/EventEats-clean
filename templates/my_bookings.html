@@ -29,6 +29,24 @@
                         <p class="mb-1"><strong>Time:</strong> {{ registration.event.event_time }}</p>
                         <p><strong>Registered At:</strong> {{ registration.registered_at }}</p>
 
+                        <p class="mb-2">
+                            <strong>Payment:</strong>
+                            {% if registration.has_pending_food_payment %}
+                                <span class="badge bg-warning text-dark">Payment pending</span>
+                                <a href="{% url 'resume_stripe_checkout' registration.id %}" class="btn btn-sm btn-primary ms-2">
+                                    Pay now (Stripe)
+                                </a>
+                            {% elif registration.payment_status == 'none' %}
+                                <span class="badge bg-secondary">Free registration</span>
+                            {% elif registration.payment_status == 'paid' %}
+                                <span class="badge bg-success">Paid</span>
+                            {% elif registration.payment_status == 'cancelled' %}
+                                <span class="badge bg-dark">Cancelled</span>
+                            {% elif registration.payment_status == 'expired' %}
+                                <span class="badge bg-danger">Expired</span>
+                            {% endif %}
+                        </p>
+
                         <h5 class="mt-4 mb-3">Food Bookings</h5>
 
                         {% if registration.food_bookings.all %}
@@ -47,7 +65,7 @@
                                             <tr>
                                                 <td>{{ booking.food_item.name }}</td>
                                                 <td>{{ booking.quantity }}</td>
-                                                <td>${{ booking.total_price }}</td>
+                                                <td>{{ booking.total_price }} AUD</td>
                                             </tr>
                                         {% endfor %}
                                     </tbody>
