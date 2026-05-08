@@ -1,4 +1,4 @@
-# Stripe webhooks + local run (macOS)
+# Stripe webhooks + local run
 
 This project reads Stripe settings from a **`.env`** file in the project root (that file is listed in `.gitignore` and must not be committed).
 
@@ -9,6 +9,64 @@ Your **test** secret key (`sk_test_...`) has appeared in chat or screenshots bef
 **Recommended:** In Stripe Dashboard go to **Developers → API keys**, open the menu next your **Secret key**, choose **Roll key**, copy the new secret, and replace `STRIPE_SECRET_KEY` in `.env`. You do not need to change any Python code.
 
 ---
+
+## Easy way — one command: `python run.py`
+
+A launcher script (`run.py`) is included in the project root. It does **everything** for you:
+
+1. Creates / activates the project's `.venv` automatically.
+2. Installs Python dependencies if they're missing.
+3. Checks the Stripe CLI is installed and logged in.
+4. Fetches the webhook signing secret from Stripe and writes it into `.env`.
+5. Runs database migrations.
+6. Starts the Stripe webhook forwarder **and** the Django dev server together, streaming both logs into the same terminal with `[stripe]` and `[django]` prefixes.
+7. Stops both cleanly when you press **Ctrl+C**.
+
+### One-time prerequisites (do these once per machine)
+
+These two steps must be done by hand because `stripe login` requires you to approve in a browser. They are not something a script can do for you.
+
+1. **Install the Stripe CLI**
+
+   - macOS: `brew install stripe/stripe-cli/stripe`
+   - Windows: `scoop install stripe` (or download from <https://github.com/stripe/stripe-cli/releases/latest>)
+
+2. **Log the Stripe CLI into your Stripe sandbox**
+
+   ```bash
+   stripe login
+   ```
+
+   Approve in your browser. This is remembered for future runs.
+
+3. **Fill in your Stripe API keys in `.env`**
+
+   Copy `.env.example` to `.env` (the launcher will do this automatically the first time it runs) and set:
+
+   ```env
+   STRIPE_PUBLISHABLE_KEY=pk_test_...
+   STRIPE_SECRET_KEY=sk_test_...
+   ```
+
+   You do **not** need to set `STRIPE_WEBHOOK_SECRET` by hand any more — `run.py` writes it for you.
+
+### Run the project
+
+From the project root:
+
+```bash
+python run.py
+```
+
+Then open <http://127.0.0.1:8000> in your browser. Press **Ctrl+C** in the terminal to stop everything.
+
+> If you see "Stripe CLI was not found" or "Stripe CLI is installed but not logged in", just complete the relevant one-time step above and re-run `python run.py`.
+
+---
+
+## Manual way (advanced)
+
+If you prefer to run each piece in its own terminal — or you want to understand what `run.py` is doing under the hood — follow the original steps below. Both ways work; pick whichever you prefer.
 
 ## Step 1 — Install Stripe CLI (one time)
 
